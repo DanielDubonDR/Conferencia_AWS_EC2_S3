@@ -8,15 +8,15 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var clients = make(map[*websocket.Conn]bool) // Clientes conectados
-var broadcast = make(chan Message)           // Canal para retransmitir mensajes
+var clients = make(map[*websocket.Conn]bool)
+var broadcast = make(chan Message)        
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
 		return true
 	},
 }
 
-var mutex = sync.Mutex{} // Para manejar concurrencia
+var mutex = sync.Mutex{}
 
 // Estructura de mensaje
 type Message struct {
@@ -25,7 +25,7 @@ type Message struct {
 }
 
 func WebSocketHandler(w http.ResponseWriter, r *http.Request) {
-	// Actualiza la conexión HTTP a WebSocket
+
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		fmt.Println("Error al actualizar a WebSocket:", err)
@@ -33,12 +33,12 @@ func WebSocketHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer ws.Close()
 
-	// Agrega al nuevo cliente conectado
+	
 	mutex.Lock()
 	clients[ws] = true
 	mutex.Unlock()
 
-	// Lee los mensajes que envía el cliente
+	
 	for {
 		var msg Message
 		err := ws.ReadJSON(&msg)
